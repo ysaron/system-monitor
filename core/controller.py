@@ -8,7 +8,7 @@ from config.settings import LOGGING
 
 SystemInfo = namedtuple(
     'SystemInfo',
-    ['cpu_count', 'cpu_percent', 'cpu_virtual_memory', 'disk_usage', 'boot_time', 'users']
+    ['cpu_count', 'cpu_percent', 'cpu_virtual_memory', 'disk_usage', 'boot_time']
 )
 
 AVAILABLE_MEMORY_THRESHOLD = 100 * 1024 * 1024  # 100 Мб
@@ -59,7 +59,6 @@ def start():
         cpu_virtual_memory=calc_virtual_memory(),
         disk_usage=calc_disk_usage(),
         boot_time=calc_boot_time(),
-        users=get_users(),
     )
     report_message = '\n\n'.join(info)
     write_log_report(report_message)
@@ -113,9 +112,3 @@ def calc_disk_usage():
 
 def calc_boot_time():
     return f'*Время загрузки системы*\n`{datetime.fromtimestamp(psutil.boot_time()):%d.%m.%Y %H:%M:%S}`'
-
-
-def get_users():
-    users = '\n'.join([f'Имя: {user.name} | Хост: {user.host} | '
-                       f'Создан: {datetime.fromtimestamp(user.started):%d.%m.%Y %H:%M:%S}' for user in psutil.users()])
-    return f'*Пользователи*\n`{users}`'

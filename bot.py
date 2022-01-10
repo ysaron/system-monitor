@@ -33,8 +33,8 @@ def run_bot():
 
 
 def run_schedule():
-    schedule.every(30).seconds.do(report_to_telegram)
-    schedule.every(20).seconds.do(report_silently)
+    schedule.every().day.at('08:00').do(report_to_telegram)
+    schedule.every(4).hours.do(report_silently)
 
     while True:
         schedule.run_pending()
