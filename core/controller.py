@@ -91,7 +91,14 @@ def calc_virtual_memory():
 
 
 def calc_disk_usage():
-    paths = [disk.device for disk in psutil.disk_partitions()]
+    header = '*Использование дискового пространства*\n'
+    match True:
+        case psutil.LINUX:
+            paths = ['/']
+        case psutil.WINDOWS:
+            paths = [disk.device for disk in psutil.disk_partitions()]
+        case _:
+            return f'{header}Неподдерживаемая ОС'
     data_list = []
     for path in paths:
         try:
@@ -101,7 +108,7 @@ def calc_disk_usage():
     stats = '\n\n'.join([f'{path}\n`{"Всего":13}: {bytes2human(data.total)}`\n'
                          f'`{"Использовано":13}: {bytes2human(data.used)}`\n'
                          f'`{"Доступно":13}: {bytes2human(data.free)}`' for path, data in zip(paths, data_list)])
-    return f'*Использование дискового пространства*\n{stats}'
+    return f'{header}{stats}'
 
 
 def calc_boot_time():
