@@ -1,54 +1,8 @@
 import psutil
-from collections import namedtuple
 from datetime import datetime
-from functools import wraps
-import logging.config
 
-from config.settings import LOGGING
-
-SystemInfo = namedtuple(
-    'SystemInfo',
-    ['cpu_count', 'cpu_percent', 'cpu_virtual_memory', 'disk_usage', 'boot_time']
-)
-
-AVAILABLE_MEMORY_THRESHOLD = 100 * 1024 * 1024  # 100 Мб
-DISK_AVAILABLE_THRESHOLD = 3 * 1024 ** 3        # 3 Гб
-CPU_PERCENT_THRESHOLD = 80
-
-logging.config.dictConfig(LOGGING)
-logger_report = logging.getLogger('report_logger')
-logger_errors = logging.getLogger('error_logger')
-
-
-def bytes2human(num: int, suffix="байт"):
-
-    if not isinstance(num, int):
-        return num
-
-    # единицы измерения приняты в соответствии с ГОСТ 8.417
-    for unit in ["", "К", "М", "Г", "Т", "П"]:
-        if abs(num) < 1024.0:
-            return f"{num:3.1f} {unit}{suffix}"
-        num /= 1024.0
-    return f"{num:.1f} Э{suffix}"
-
-
-def write_log_report(message: str):
-    report_message = message.replace('`', '').replace('*', '____')
-    logger_report.info(msg=report_message)
-
-
-def write_log_errors(func):
-
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except Exception as e:
-            logger_errors.error(f'{e.__class__.__name__}: {e}')
-            raise e
-
-    return wrapper
+from .utils import SystemInfo, write_log_errors, write_log_report, bytes2human
+from config.settings import AVAILABLE_MEMORY_THRESHOLD, DISK_AVAILABLE_THRESHOLD, CPU_PERCENT_THRESHOLD
 
 
 @write_log_errors
@@ -99,14 +53,19 @@ def calc_disk_usage():
         case _:
             return f'{header}Неподдерживаемая ОС'
     data_list = []
+    warnings = []
     for path in paths:
         try:
-            data_list.append(psutil.disk_usage(path))
+            data = psutil.disk_usage(path)
+            data_list.append(data)
+            warning = ' ❗' if data.free < DISK_AVAILABLE_THRESHOLD else ''
+            warnings.append(warning)
         except PermissionError:
             del path
     stats = '\n\n'.join([f'{path}\n`{"Всего":13}: {bytes2human(data.total)}`\n'
                          f'`{"Использовано":13}: {bytes2human(data.used)}`\n'
-                         f'`{"Доступно":13}: {bytes2human(data.free)}`' for path, data in zip(paths, data_list)])
+                         f'`{"Доступно":13}: {bytes2human(data.free)}`{warning}'
+                         for path, data, warning in zip(paths, data_list, warnings)])
     return f'{header}{stats}'
 
 
