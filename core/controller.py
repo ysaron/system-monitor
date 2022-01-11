@@ -6,7 +6,7 @@ from config.settings import AVAILABLE_MEMORY_THRESHOLD, DISK_AVAILABLE_THRESHOLD
 
 
 @write_log_errors
-def start():
+def report(log: bool = True):
     info = SystemInfo(
         cpu_count=calc_cpu_count(),
         cpu_percent=calc_cpu_percent(),
@@ -15,7 +15,8 @@ def start():
         boot_time=calc_boot_time(),
     )
     report_message = '\n\n'.join(info)
-    write_log_report(report_message)
+    if log:
+        write_log_report(report_message)
     return report_message
 
 
