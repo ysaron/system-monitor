@@ -1,0 +1,2 @@
+report_to_telegram_time: '08:00'      # Время ежедневной отправки отчета в Telegram (HH:MM)
+report_silently_every_hours: 4        # Число часов между измерениями

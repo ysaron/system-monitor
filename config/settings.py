@@ -1,10 +1,17 @@
 from dotenv import load_dotenv
+import yaml
 import os
 
 load_dotenv()
 
 TOKEN = os.environ.get('TOKEN')
 MY_ID = int(os.environ.get('MY_ID'))
+
+with open('config/config.yaml') as f:
+    cfg = yaml.safe_load(f)
+
+REPORT_TIME = cfg.get('report_to_telegram_time', '08:00')
+REPORT_EVERY = cfg.get('report_silently_every_hours', 4)
 
 LOGGING = {
     'version': 1,

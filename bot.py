@@ -3,7 +3,7 @@ import threading
 from telebot import TeleBot
 import schedule
 
-from config.settings import TOKEN, MY_ID
+from config.settings import TOKEN, MY_ID, REPORT_TIME, REPORT_EVERY
 from core import controller
 
 bot = TeleBot(token=TOKEN, parse_mode='MARKDOWN')
@@ -33,8 +33,8 @@ def run_bot():
 
 
 def run_schedule():
-    schedule.every().day.at('08:00').do(report_to_telegram)
-    schedule.every(4).hours.do(report_silently)
+    schedule.every().day.at(REPORT_TIME).do(report_to_telegram)
+    schedule.every(REPORT_EVERY).hours.do(report_silently)
 
     while True:
         schedule.run_pending()
