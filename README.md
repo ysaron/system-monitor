@@ -1,8 +1,10 @@
 # system-monitor  
-Приложение для мониторинга VPS.  
+
+[![Python](https://img.shields.io/badge/python-v3.10.1-blueviolet.svg?logo=python&logoColor=white)](https://www.python.org/)
+[![License](https://img.shields.io/badge/license-MIT-9cf.svg)](https://opensource.org/licenses/MIT)
 
 ## Описание
-
+Простое приложение для мониторинга VPS.  
 - Настраиваемое время измерений.
 - Запись отчета в логи.
 - Ежедневная отправка отчета в Telegram и отправка отчета по команде.
